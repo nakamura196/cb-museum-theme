@@ -92,18 +92,18 @@ a:hover { color: var(--museum-accent-dark); }
     }
     .text-primary { color: var(--museum-accent) !important; }
     .bg-primary { background-color: var(--museum-accent) !important; }
-}
-
-/* ========== dark mode: colours fixed in templates and libraries ========== */
-[data-bs-theme="dark"] {
-    .text-dark { color: var(--museum-ink) !important; }
-    /* _theme-colors.scss compiles btn-outline-dark/primary with the light-mode colours
-       ("Item Info" next to the title vanished; subject and location buttons were brown on navy) */
+    /* _theme-colors.scss compiles btn-outline-dark/primary with config-theme-colors.csv
+       (dark: "Item Info" next to the title vanished; modern: subject and location buttons were brown on navy) */
     .btn-outline-dark, .btn-outline-primary {
         color: var(--bs-btn-color);
         border-color: var(--bs-btn-border-color);
         &:hover, &:focus-visible, &:active { color: var(--bs-btn-hover-color); background-color: var(--bs-btn-hover-bg); border-color: var(--bs-btn-hover-border-color); }
     }
+}
+
+/* ========== dark mode: colours fixed in templates and libraries ========== */
+[data-bs-theme="dark"] {
+    .text-dark { color: var(--museum-ink) !important; }
     /* bg-light: the credits block on the about page (_includes/cb/credits.html) */
     .bg-white, .bg-light { background-color: var(--museum-surface) !important; }
     /* _pages.scss colours the about page's table of contents with text-color and !important */
