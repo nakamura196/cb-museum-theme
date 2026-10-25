@@ -133,6 +133,8 @@ a:focus:not(:focus-visible), .btn:focus:not(:focus-visible), .nav-link:focus:not
     letter-spacing: 0.04em;
     --bs-btn-focus-box-shadow: none;
 }
+/* tag cloud terms can be long; let them wrap instead of overflowing on narrow screens */
+[id^="cloud-div-"] .btn { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
 .btn-lg { font-size: 1rem; padding: 0.6rem 1.4rem; }
 /* quiet secondary actions: outlined, not grey slabs */
 .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-dark, .btn-outline-primary {
