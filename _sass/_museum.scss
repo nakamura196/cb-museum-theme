@@ -2,9 +2,10 @@
     Museum theme for CollectionBuilder
     ----------------------------------
     Quiet palette, serif headings, generous whitespace, large images.
-    Language-neutral: fonts are picked by the page language (<html lang>, set
-    from `lang` in _config.yml), so the same theme serves English, Japanese,
-    Chinese and Korean collections. CSS only; no template changes needed.
+    Language-neutral: fonts are picked by the page language (<html lang> in
+    _layouts/default.html), so the same theme serves English, Japanese,
+    Chinese and Korean collections. Needs a few lines in CollectionBuilder's
+    templates (see the README) to set the look and draw the theme's menu.
 
     How it works: Bootstrap 5.3 reads its colours, radii and focus rings from
     CSS variables (--bs-*). This file points those variables at the museum
@@ -345,6 +346,8 @@ footer.bg-black {
     overflow: hidden;
     img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
 }
+.museum-card-img:has(.museum-card-icon) { display: flex; align-items: center; justify-content: center; }
+.museum-card-icon { width: 30%; height: 30%; color: var(--museum-muted); }
 .museum-card-title { font-size: 1rem; margin: 0.75rem 0 0.15rem; line-height: 1.55; }
 .museum-card-meta { font-size: 0.8rem; color: var(--museum-muted); margin: 0; letter-spacing: 0.06em; }
 

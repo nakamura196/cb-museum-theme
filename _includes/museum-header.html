@@ -1,0 +1,18 @@
+{% comment %}
+
+    Museum theme: the top of every page, in place of CB-CSV's two lines
+    {% include collection-banner.html %} and {% include collection-nav.html %} in "_layouts/default.html".
+
+    - modern look: the menu bar ("_includes/museum-nav.html") above the title banner
+    - museum look: the title banner above the menu bar, as in CB-CSV
+    The banner is CB-CSV's own "_includes/collection-banner.html", unchanged.
+
+{%- endcomment -%}
+{%- assign style = site.data.theme.theme-style | default: "modern" -%}
+{% if style == "modern" -%}
+{% include museum-nav.html %}
+{% include collection-banner.html %}
+{%- else -%}
+{% include collection-banner.html %}
+{% include museum-nav.html %}
+{%- endif %}

@@ -1,0 +1,50 @@
+{% comment %}
+
+    Museum theme: the menu bar (a copy of CB-CSV's "_includes/collection-nav.html" with the theme's changes).
+
+    Used by "_includes/museum-header.html" in both looks, so CB-CSV's own collection-nav.html stays as it is.
+    The menu items still come from "_data/config-nav.csv", and navbar-background / navbar-color from "_data/theme.yml".
+    Changes from collection-nav.html:
+    - modern look: the site name sits at the left of the bar, and the menu folds into the button below 1200px (xl) instead of 992px (lg)
+    - color-mode-toggle: true: the light/dark switch sits after the search box, and the fixed data-bs-theme is left off (otherwise the bar stays light in dark mode)
+    - the organization logo beside the menu button on small screens (organization-logo-nav) is left out: CB-CSV's bar is black and the logo is usually white, so it cannot be seen on the theme's light bar. The logo stays in the banner and footer
+
+{%- endcomment -%}
+{%- assign style = site.data.theme.theme-style | default: "modern" -%}
+{%- if style == "modern" %}{% assign bp = "xl" %}{% else %}{% assign bp = "lg" %}{% endif -%}
+<nav class="navbar navbar-expand-{{ bp }} {{ site.data.theme.navbar-background | default: 'bg-black' }}"{% unless site.data.theme.color-mode-toggle %} data-bs-theme="{{ site.data.theme.navbar-color | default: 'dark' }}"{% endunless %}>
+    <div class="container">
+        {% if style == "modern" %}<a class="navbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>{% endif %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#page-nav" aria-controls="page-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="page-nav">
+            <ul class="navbar-nav me-auto">
+                {%- assign navItems = site.data.config-nav | where_exp: 'item', 'item.display_name and item.dropdown_parent == nil' -%} 
+                {% for nav in navItems %}
+                {% if nav.stub %}
+                <li class="nav-item">
+                    <a class="nav-link{% if page.url == nav.stub %} active{% endif %}" {% if page.url == nav.stub %}aria-current="page" {% endif %}href="{{ nav.stub | relative_url }}">{{ nav.display_name }}</a>
+                </li>
+                {%- else -%}
+                <li class="nav-item dropdown">
+                    {% assign navChildren = site.data.config-nav | where_exp: 'item', 'item.dropdown_parent == nav.display_name' %}
+                    {%- assign childStubs = navChildren | map: 'stub' -%}
+                    <a class="nav-link  dropdown-toggle{% if childStubs contains page.url %} active{% endif %}" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ nav.display_name }}</a>
+                    <div class="dropdown-menu">
+                        {% for c in navChildren %}
+                        <a class="dropdown-item {% if page.url == c.stub %}active{% endif %}" {% if page.url == c.stub %}aria-current="page" {% endif %}href="{{ c.stub | relative_url }}">{{ c.display_name }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+                {% endif %}
+                {%- endfor -%}
+            </ul>
+            
+            {% include nav-search-lunr.html %}
+            {% if site.data.theme.color-mode-toggle %}{% include color-mode-toggle.html %}{% endif %}
+            
+        </div>
+    </div>
+</nav>

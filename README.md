@@ -15,6 +15,8 @@ Both come with a light/dark switch and work through Bootstrap 5.3 CSS variables,
 | `_sass/_modern.scss` | modern palette, dark palettes, one-row header, item-page layout |
 | `_includes/head/color-mode.html` | sets light/dark before the page is drawn, so a dark page does not flash white |
 | `_includes/color-mode-toggle.html` | the light/dark button in the menu |
+| `_includes/museum-header.html` | the top of every page: menu and title banner, in the order of the look |
+| `_includes/museum-nav.html` | the theme's menu bar, a copy of CB-CSV's `collection-nav.html` with the site name (modern) and the switch, without the small-screen logo |
 | `_layouts/home-museum.html` | optional home page: large search box, example queries, image grid |
 
 ## Install
@@ -49,51 +51,50 @@ Both come with a light/dark switch and work through Bootstrap 5.3 CSS variables,
 
 ### Hooks in CollectionBuilder's templates
 
-Jekyll uses a site's own file when the site and the theme have files with the same name. Every CollectionBuilder site already has these templates, so the theme cannot change them from the gem. Add these lines by hand instead.
+Jekyll uses a site's own file when the site and the theme have files with the same name. Every CollectionBuilder site already has these templates, so the theme cannot change them from the gem. Add these lines by hand instead: a few lines in two files.
+CollectionBuilder's menu (`_includes/collection-nav.html`) and banner (`_includes/collection-banner.html`) are not edited; the theme uses its own copy of the menu, `_includes/museum-nav.html`.
+To remove the theme, undo these edits and the steps above.
 
-`_includes/head/head.html`, inside `<head>`:
+`_includes/head/head.html`, on a new line right after `<meta charset="utf-8">`:
 
 ```liquid
 {% if site.data.theme.color-mode-toggle %}{% include head/color-mode.html %}{% endif %}
 ```
 
-`_layouts/default.html`: put the look on `<html>`, and in the modern look draw the menu above the banner:
+`_layouts/default.html`: put the look on `<html>`, and draw the top of the page with the theme's menu.
+
+Replace the first two lines:
+
+```liquid
+<!doctype html>
+<html lang="en" class="h-100">
+```
+
+with:
 
 ```liquid
 {%- assign style = site.data.theme.theme-style | default: "modern" -%}
-<html lang="{{ site.lang | default: "en" }}" class="h-100" data-style="{{ style }}">
-...
-    {% if style == "modern" %}{% include collection-nav.html %}
-    {% include collection-banner.html %}{% else %}{% include collection-banner.html %}
-    {% include collection-nav.html %}{% endif %}
+<!doctype html>
+<html lang="en" class="h-100" data-style="{{ style }}">
 ```
 
-`_includes/collection-nav.html`: in the modern look the bar also holds the site name, and the switch sits at its right end. Four changes:
+Replace:
 
-1. Before `<nav>`, pick the style. The modern bar holds more, so it folds into the menu button below 1200px instead of 992px:
+```liquid
+    {% include collection-banner.html %}
+    {% include collection-nav.html %}
+```
 
-   ```liquid
-   {%- assign style = site.data.theme.theme-style | default: "modern" -%}
-   {%- if style == "modern" %}{% assign bp = "xl" %}{% else %}{% assign bp = "lg" %}{% endif -%}
-   ```
+with:
 
-2. On `<nav>`, use that breakpoint, and drop the fixed `data-bs-theme` when the switch is on (otherwise the bar stays light in dark mode):
+```liquid
+    {% include museum-header.html %}
+```
 
-   ```liquid
-   <nav class="navbar navbar-expand-{{ bp }} {{ site.data.theme.navbar-background | default: 'bg-black' }}"{% unless site.data.theme.color-mode-toggle %} data-bs-theme="{{ site.data.theme.navbar-color | default: 'dark' }}"{% endunless %}>
-   ```
+If your site is not in English, also change `lang="en"` to your language (for example `lang="ja"`). The theme picks its fonts from it.
 
-3. Right after `<div class="container">`, the site name, and on the mobile logo `d-lg-none` becomes `d-{{ bp }}-none`:
-
-   ```liquid
-   {% if style == "modern" %}<a class="navbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>{% endif %}
-   ```
-
-4. After `{% include nav-search-lunr.html %}`, the switch:
-
-   ```liquid
-   {% if site.data.theme.color-mode-toggle %}{% include color-mode-toggle.html %}{% endif %}
-   ```
+The menu items still come from `_data/config-nav.csv`, as before.
+If you have changed `_includes/collection-nav.html` yourself, copy `_includes/museum-nav.html` from this gem into your site and make the same change there; the same applies when a newer CollectionBuilder changes its menu.
 
 ## Customize
 
