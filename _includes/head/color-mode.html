@@ -1,8 +1,14 @@
+{%- assign t = site.data.locale[site.lang] -%}
 {%- comment -%}
-    Light / dark colour mode (Bootstrap 5.3 `data-bs-theme` on <html>).
-    Runs before the stylesheets so a dark page never flashes white.
-    The visitor's choice is kept in localStorage; until they pick one, the OS setting is used.
-    The switch itself is _includes/color-mode-toggle.html (`color-mode-toggle` in theme.yml).
+    Light / dark colour mode (Bootstrap 5.3 `data-bs-theme` on <html>),
+    Grid / List view mode (`data-view` on <html>), and thumbnail fit (`data-thumb-fit`).
+    Runs before the stylesheets so a dark page never flashes white
+    and browse/search pages render in the visitor's chosen layout immediately.
+    Configured in _data/theme.yml:
+      color-mode-toggle: true | false
+      view-mode-toggle:  true | false   (default: true)
+      default-view:      grid | list    (default: grid)
+      thumb-fit:         contain | cover (default: contain)
 {%- endcomment -%}
 <script>
 (function () {
@@ -16,6 +22,72 @@
             var mode = root.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
             try { localStorage.setItem(key, mode); } catch (e) {}
             apply(mode);
+        }
+    };
+
+    var thumbFit = {{ site.data.theme.thumb-fit | default: "contain" | jsonify }};
+    if (thumbFit) { root.setAttribute("data-thumb-fit", thumbFit); }
+
+    var viewToggleEnabled = {{ site.data.theme.view-mode-toggle | default: true | jsonify }};
+    var viewKey = "cb-view-mode", defaultView = {{ site.data.theme.default-view | default: "grid" | jsonify }};
+    var isJa = (root.getAttribute("lang") || "").indexOf("ja") === 0;
+    var labels = {
+        mode: {{ t.view_mode | jsonify }} || (isJa ? "表示レイアウト" : "View mode"),
+        grid: {{ t.view_grid | jsonify }} || (isJa ? "グリッド" : "Grid"),
+        list: {{ t.view_list | jsonify }} || (isJa ? "リスト" : "List")
+    };
+    function savedView() { try { return localStorage.getItem(viewKey); } catch (e) { return null; } }
+    function syncViewButtons(mode) {
+        document.querySelectorAll(".view-mode-btn").forEach(function (btn) {
+            var active = btn.getAttribute("data-view-mode") === mode;
+            btn.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+    }
+    function applyView(mode) {
+        var m = (mode === "list" || mode === "grid") ? mode : defaultView;
+        root.setAttribute("data-view", m);
+        syncViewButtons(m);
+    }
+    function mountToggleIfMissing() {
+        if (!viewToggleEnabled) return;
+        if (document.querySelector(".view-mode-toggle")) {
+            syncViewButtons(root.getAttribute("data-view"));
+            return;
+        }
+        var target = document.getElementById("searchResults") || document.getElementById("browseItems");
+        if (!target) return;
+        var wrap = document.createElement("div");
+        wrap.className = "d-flex justify-content-end my-2";
+        wrap.innerHTML =
+            '<div class="btn-group btn-group-sm view-mode-toggle" role="group" aria-label="' + labels.mode + '">' +
+                '<button type="button" class="btn btn-outline-secondary view-mode-btn" data-view-mode="grid" onclick="cbViewMode.set(\'grid\')" title="' + labels.grid + '" aria-label="' + labels.grid + '">' +
+                    '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>' +
+                    '<span class="ms-1">' + labels.grid + '</span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-outline-secondary view-mode-btn" data-view-mode="list" onclick="cbViewMode.set(\'list\')" title="' + labels.list + '" aria-label="' + labels.list + '">' +
+                    '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>' +
+                    '<span class="ms-1">' + labels.list + '</span>' +
+                '</button>' +
+            '</div>';
+        var sortBtn = document.getElementById("browseSortButton");
+        if (sortBtn && sortBtn.parentElement && sortBtn.parentElement.parentElement) {
+            wrap.className = "mt-2";
+            sortBtn.parentElement.parentElement.appendChild(wrap);
+        } else {
+            target.parentNode.insertBefore(wrap, target);
+        }
+        syncViewButtons(root.getAttribute("data-view"));
+    }
+    applyView(viewToggleEnabled ? savedView() : defaultView);
+    document.addEventListener("DOMContentLoaded", mountToggleIfMissing);
+    window.cbViewMode = {
+        set: function (mode) {
+            try { localStorage.setItem(viewKey, mode); } catch (e) {}
+            applyView(mode);
+        },
+        toggle: function () {
+            var next = root.getAttribute("data-view") === "list" ? "grid" : "list";
+            this.set(next);
         }
     };
 })();

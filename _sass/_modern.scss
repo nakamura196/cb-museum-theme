@@ -207,9 +207,15 @@ a:hover { color: var(--museum-accent-dark); }
     [data-style="modern"] #about-wrapper { max-width: 1520px; }
 }
 
-/* browse: more, smaller tiles on wide screens (the browse script writes col-lg-4) */
-@media (min-width: 1200px) { [data-style="modern"] #browseItems .item { flex: 0 0 25%; max-width: 25%; } }
-@media (min-width: 1600px) { [data-style="modern"] #browseItems .item { flex: 0 0 20%; max-width: 20%; } }
+/* browse & search: more, smaller tiles on wide screens in grid mode */
+@media (min-width: 1200px) {
+    [data-style="modern"] #browseItems .item { flex: 0 0 25%; max-width: 25%; }
+    [data-style="modern"]:not([data-view="list"]) #searchResults > ul.list-unstyled { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1600px) {
+    [data-style="modern"] #browseItems .item { flex: 0 0 20%; max-width: 20%; }
+    [data-style="modern"]:not([data-view="list"]) #searchResults > ul.list-unstyled { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 
 /* ========== modern: hero and footer ========== */
 [data-style="modern"] #home-banner { min-height: min(56vh, 560px); }

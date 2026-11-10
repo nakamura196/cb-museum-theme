@@ -13,10 +13,11 @@ Both come with a light/dark switch and work through Bootstrap 5.3 CSS variables,
 | --- | --- |
 | `_sass/_museum.scss` | museum palette (`--museum-*` variables) and component styles |
 | `_sass/_modern.scss` | modern palette, dark palettes, one-row header, item-page layout |
-| `_includes/head/color-mode.html` | sets light/dark before the page is drawn, so a dark page does not flash white |
+| `_includes/head/color-mode.html` | sets light/dark (`data-bs-theme`) and grid/list (`data-view`) before the page is drawn |
 | `_includes/color-mode-toggle.html` | the light/dark button in the menu |
 | `_includes/museum-header.html` | the top of every page: menu and title banner, in the order of the look |
 | `_includes/museum-nav.html` | the theme's menu bar, a copy of CB-CSV's `collection-nav.html` with the site name (modern) and the switch, without the small-screen logo |
+| `_includes/view-mode-toggle.html` | the grid/list layout switch for Browse and Search pages |
 | `_layouts/home-museum.html` | optional home page: large search box, example queries, image grid |
 
 ## Install
@@ -40,11 +41,14 @@ Both come with a light/dark switch and work through Bootstrap 5.3 CSS variables,
    @use "modern";
    ```
 
-4. Choose the look in `_data/theme.yml`:
+4. Choose the look and display options in `_data/theme.yml`:
 
    ```yaml
-   theme-style: modern     # modern / museum
-   color-mode-toggle: true # light/dark switch; follows the OS setting until a visitor picks one
+   theme-style: modern       # modern / museum
+   color-mode-toggle: true   # light/dark switch; follows the OS setting until a visitor picks one
+   view-mode-toggle: true    # grid/list switch on Browse and Search pages (default: true)
+   default-view: grid        # initial layout for Browse and Search: grid / list (default: grid)
+   thumb-fit: contain        # thumbnail sizing: contain (whole image, default) / cover (cropped to 4:3)
    ```
 
 5. Add the small hooks below to CollectionBuilder's templates.
@@ -100,7 +104,13 @@ If you have changed `_includes/collection-nav.html` yourself, copy `_includes/mu
 
 Try these in order. The earlier ones keep receiving fixes from the gem.
 
-1. **Settings** in `_data/theme.yml` (`theme-style`, `color-mode-toggle`, `font-cdn`).
+1. **Settings** in `_data/theme.yml`:
+   - `theme-style`: `modern` (default) or `museum`
+   - `color-mode-toggle`: `true` or `false` (light/dark switch)
+   - `view-mode-toggle`: `true` (default) or `false` (grid/list switch on Browse and Search; mounted automatically by `head/color-mode.html`, or placed manually via `{% include view-mode-toggle.html %}`)
+   - `default-view`: `grid` (default) or `list` (initial layout before a visitor chooses one; stored in `localStorage` as `cb-view-mode`)
+   - `thumb-fit`: `contain` (default, shows the whole uncropped image) or `cover` (crops to fill the 4:3 thumbnail box)
+   - `font-cdn`: web font stylesheet `<link>` tags
 2. **Variables and extra rules** in `_sass/_custom.scss`, after the `@use` lines. For example:
 
    ```scss

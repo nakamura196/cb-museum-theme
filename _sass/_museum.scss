@@ -344,7 +344,7 @@ footer.bg-black {
     aspect-ratio: 4 / 3;
     background: var(--museum-paper-2);
     overflow: hidden;
-    img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s ease; }
 }
 .museum-card-img:has(.museum-card-icon) { display: flex; align-items: center; justify-content: center; }
 .museum-card-icon { width: 30%; height: 30%; color: var(--museum-muted); }
@@ -386,7 +386,7 @@ img.lazyloaded { opacity: 1; transition: opacity 0.4s ease; }
     margin-top: 1rem;
     .item { margin-bottom: 2.5rem !important; }
     .card { background: transparent; border: none; border-radius: 0; }
-    .card-img-top { aspect-ratio: 4 / 3; object-fit: cover; border-radius: 0; background: var(--museum-paper-2); }
+    .card-img-top { aspect-ratio: 4 / 3; object-fit: contain; border-radius: 0; background: var(--museum-paper-2); }
     .card-body { text-align: left !important; padding: 0.75rem 0 0; }
     .card-title { font-size: 1.05rem; margin-bottom: 0.3rem; }
     .card-title a { color: var(--museum-ink) !important; text-decoration: none; }
@@ -405,13 +405,116 @@ img.lazyloaded { opacity: 1; transition: opacity 0.4s ease; }
 /* ========== search results ========== */
 #searchResults {
     .search-result { display: flex; gap: 1.25rem; padding-bottom: 1.25rem; border-color: var(--museum-line) !important; }
-    .search-thumb { flex: 0 0 120px; aspect-ratio: 4 / 3; background: var(--museum-paper-2); overflow: hidden; }
-    .search-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .search-thumb { flex: 0 0 150px; aspect-ratio: 4 / 3; background: var(--museum-paper-2); overflow: hidden; }
+    .search-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .search-text { min-width: 0; }
     h4 { font-size: 1.1rem; margin-bottom: 0.3rem; }
     h4 a { text-decoration: none; }
     p { margin-left: 0 !important; font-size: 0.9rem; color: var(--museum-muted);
         display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
+/* ========== view mode toggle (grid / list) ========== */
+.view-mode-toggle {
+    .view-mode-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: transparent;
+        color: var(--museum-ink);
+        border-color: var(--museum-line-strong);
+        font-size: 0.85rem;
+        padding: 0.3rem 0.65rem;
+        &:hover {
+            color: var(--museum-accent);
+            border-color: var(--museum-accent);
+            background: rgba(var(--museum-accent-rgb), 0.06);
+        }
+    }
+}
+:root[data-view="grid"] .view-mode-toggle .view-mode-btn[data-view-mode="grid"],
+:root:not([data-view="list"]) .view-mode-toggle .view-mode-btn[data-view-mode="grid"],
+:root[data-view="list"] .view-mode-toggle .view-mode-btn[data-view-mode="list"] {
+    background: var(--museum-accent);
+    border-color: var(--museum-accent);
+    color: var(--museum-on-accent, #fff);
+}
+
+/* Browse in list mode */
+:root[data-view="list"] #browseItems {
+    .item {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-bottom: 1.25rem !important;
+    }
+    .card {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--museum-line);
+    }
+    .card > a:first-child {
+        flex: 0 0 150px;
+        width: 150px;
+        display: block;
+    }
+    .card-body {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+}
+
+/* Search in grid mode */
+:root:not([data-view="list"]) #searchResults {
+    > ul.list-unstyled {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 2.25rem 1.5rem;
+    }
+    .search-result {
+        flex-direction: column;
+        gap: 0.65rem;
+        padding-bottom: 0;
+        margin-bottom: 0 !important;
+        border-bottom: none !important;
+    }
+    .search-thumb {
+        flex: 0 0 auto;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+    }
+    .search-thumb img {
+        transition: transform 0.3s ease;
+    }
+    .search-result:hover .search-thumb img {
+        transform: scale(1.02);
+    }
+    .search-text h4 {
+        font-size: 0.98rem;
+        line-height: 1.45;
+        margin-bottom: 0.25rem;
+    }
+    .search-text h4 a {
+        color: var(--museum-ink);
+    }
+    .search-text h4 a:hover {
+        color: var(--museum-accent);
+    }
+    .search-text p {
+        font-size: 0.84rem;
+        -webkit-line-clamp: 3;
+        margin-bottom: 0;
+    }
+}
+
+/* Optional override when a site wants cropped thumbnails */
+:root[data-thumb-fit="cover"] {
+    .museum-card-img img, #browseItems .card-img-top, #searchResults .search-thumb img, #timeline .timeline-thumb { object-fit: cover; }
 }
 
 /* ========== item pages ========== */
@@ -455,7 +558,7 @@ img.lazyloaded { opacity: 1; transition: opacity 0.4s ease; }
     th h3 { font-size: 1.6rem; color: var(--museum-accent); }
     td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
     .timeline-thumb {
-        width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+        width: 100%; aspect-ratio: 4 / 3; object-fit: contain;
         border: none; border-radius: 0; padding: 0; background: var(--museum-paper-2);
         margin-bottom: 1rem;
     }
@@ -512,7 +615,10 @@ table.dataTable thead > tr > th.sorting_asc::before, table.dataTable thead > tr 
     #browseItems .item { width: 50%; padding-left: 0.45rem; padding-right: 0.45rem; margin-bottom: 1.75rem !important; }
     #browseItems .card-title { font-size: 0.95rem; }
     #browseItems .card-text strong { display: none; }
-    #searchResults .search-thumb { flex-basis: 84px; }
+    #searchResults .search-thumb { flex-basis: 96px; }
+    :root:not([data-view="list"]) #searchResults > ul.list-unstyled { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 0.9rem; }
+    :root:not([data-view="list"]) #searchResults .search-thumb { flex-basis: auto; }
+    :root[data-view="list"] #browseItems .card > a:first-child { flex: 0 0 96px; width: 96px; }
     #metadata dl { grid-template-columns: 1fr; gap: 0.1rem; }
     #metadata dd { margin-bottom: 0.9rem; }
     #timeline th { width: auto; display: block; padding-bottom: 0; }
