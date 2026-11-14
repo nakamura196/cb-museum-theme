@@ -112,6 +112,9 @@ a:hover { color: var(--museum-accent-dark); }
     .dropdown-menu { --bs-dropdown-link-active-color: var(--museum-on-accent); }
     .pagination { --bs-pagination-active-color: var(--museum-on-accent); }
     #activeFilters .btn:not([onclick*="add"]) { color: var(--museum-on-accent); }
+    /* newer CB-CSV adds the "Add Field" button with addEventListener (no onclick):
+       it is the last button, outlined like in _museum.scss, so it keeps the ink colour */
+    #activeFilters .btn:last-child:not(:first-child) { color: var(--museum-ink); }
     .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--museum-surface); color: var(--museum-ink); }
     .leaflet-container a.leaflet-popup-close-button { color: var(--museum-muted); }
     /* photos and scans: slightly dimmed so they do not glare on a dark page */
